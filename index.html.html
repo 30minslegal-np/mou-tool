@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Tạo MOU | DELULU JSC</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,600&family=DM+Sans:wght@300;400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+
+<script src="https://unpkg.com/docx@8.5.0/build/index.umd.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+
+<style>
+:root{
+  --ink:#0d0f18;--ink2:#1a1e2a;--ink3:#252a38;
+  --gold:#b8953a;--gl:#d4af5a;--cream:#f8f5ee;
+  --slate:#6b7280;--muted:#9ca3af;--white:#fff;
+  --red:#dc2626;--green:#16a34a;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--ink);min-height:100vh}
+a{text-decoration:none;color:inherit}
+
+/* ── TOP BAR ── */
+.topbar{background:var(--ink);padding:0 28px;height:48px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;border-bottom:1px solid rgba(184,149,58,.2)}
+.topbar-logo{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:700;color:var(--gl);letter-spacing:.5px}
+.topbar-back{font-size:11px;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,.4);display:flex;align-items:center;gap:6px;transition:.2s}
+.topbar-back:hover{color:var(--gl)}
+.lang-btns{display:flex;gap:4px}
+.lang-btns button{padding:4px 11px;border:1px solid rgba(184,149,58,.3);background:transparent;color:rgba(255,255,255,.4);font-size:11px;font-weight:700;letter-spacing:1px;cursor:pointer;border-radius:2px;transition:.2s;font-family:inherit}
+.lang-btns button.active{background:var(--gold);color:var(--ink);border-color:var(--gold)}
+
+/* ── HERO ── */
+.hero{background:var(--ink2);padding:36px 28px 28px;text-align:center;border-bottom:1px solid rgba(184,149,58,.15)}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);border:1px solid rgba(184,149,58,.3);padding:4px 14px;border-radius:2px;margin-bottom:14px}
+.hero h1{font-family:'Cormorant Garamond',serif;font-size:clamp(26px,4vw,40px);font-weight:700;color:var(--white);margin-bottom:8px}
+.hero h1 em{font-style:italic;color:var(--gl)}
+.hero-sub{font-size:13px;color:rgba(255,255,255,.4);max-width:520px;margin:0 auto}
+.steps-strip{display:flex;justify-content:center;gap:0;margin-top:20px;flex-wrap:wrap}
+.step-pill{display:flex;align-items:center;gap:8px;padding:8px 16px;font-size:11px;color:rgba(255,255,255,.45)}
+.step-pill .num{background:rgba(184,149,58,.2);color:var(--gl);font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.step-pill.active .num{background:var(--gold);color:var(--ink)}
+.step-pill.active{color:var(--white)}
+.step-arrow{color:rgba(184,149,58,.3);font-size:16px;padding:0 4px}
+
+/* ── LAYOUT ── */
+.main{max-width:1100px;margin:0 auto;padding:28px;display:grid;grid-template-columns:1fr 420px;gap:24px;align-items:start}
+
+/* ── FORM PANEL ── */
+.form-panel{background:var(--white);border-radius:6px;box-shadow:0 2px 20px rgba(0,0,0,.06);overflow:hidden}
+.form-panel-head{background:var(--ink2);padding:20px 28px;display:flex;align-items:center;gap:12px}
+.form-panel-head .ico{font-size:24px}
+.form-panel-head h2{font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--white);font-weight:700}
+.form-panel-head p{font-size:12px;color:rgba(255,255,255,.4);margin-top:2px}
+.form-body{padding:24px 28px}
+.section-label{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:10px}
+.section-label::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(184,149,58,.3),transparent)}
+.form-group{margin-bottom:16px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.form-label{display:block;font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--slate);margin-bottom:6px}
+.form-label span{font-size:10px;color:var(--muted);font-style:italic;text-transform:none;letter-spacing:0;font-weight:400}
+.form-input{width:100%;padding:11px 14px;border:1.5px solid #e5dcc8;border-radius:4px;font-size:14px;color:var(--ink);background:var(--white);transition:.2s;font-family:inherit}
+.form-input:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(184,149,58,.1)}
+.form-input::placeholder{color:#c4b89a}
+.form-textarea{resize:vertical;min-height:72px}
+.form-divider{height:1px;background:linear-gradient(90deg,rgba(184,149,58,.15),transparent);margin:20px 0}
+.checkbox-group{display:flex;flex-direction:column;gap:8px}
+.checkbox-item{display:flex;align-items:center;gap:10px;cursor:pointer;padding:8px 12px;border:1.5px solid #e5dcc8;border-radius:4px;transition:.2s;user-select:none}
+.checkbox-item:hover{border-color:rgba(184,149,58,.4);background:rgba(184,149,58,.04)}
+.checkbox-item input{accent-color:var(--gold);width:16px;height:16px;flex-shrink:0;cursor:pointer}
+.checkbox-item input:checked + .cb-text{color:var(--ink);font-weight:500}
+.checkbox-item:has(input:checked){border-color:var(--gold);background:rgba(184,149,58,.06)}
+.cb-text{font-size:13px;color:var(--slate)}
+.cb-text small{display:block;font-size:11px;color:var(--muted);font-style:italic;margin-top:1px}
+.scope-other{margin-top:8px;display:none}
+.scope-other.show{display:block}
+.date-group{display:flex;gap:8px}
+.date-part{flex:1;text-align:center}
+.date-part label{font-size:10px;color:var(--muted);display:block;margin-bottom:4px}
+.date-part input{width:100%;padding:10px 8px;border:1.5px solid #e5dcc8;border-radius:4px;font-size:14px;text-align:center;font-family:'JetBrains Mono',monospace;color:var(--ink)}
+.date-part input:focus{outline:none;border-color:var(--gold)}
+.term-select{width:100%;padding:11px 14px;border:1.5px solid #e5dcc8;border-radius:4px;font-size:14px;color:var(--ink);background:var(--white);cursor:pointer;font-family:inherit}
+.term-select:focus{outline:none;border-color:var(--gold)}
+
+/* ── PREVIEW PANEL ── */
+.preview-panel{position:sticky;top:72px}
+.preview-card{background:var(--white);border-radius:6px;box-shadow:0 2px 20px rgba(0,0,0,.06);overflow:hidden}
+.preview-head{background:linear-gradient(135deg,var(--gold),var(--gl));padding:16px 22px;display:flex;align-items:center;justify-content:space-between}
+.preview-head h3{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:700;color:var(--ink)}
+.preview-head span{font-size:10px;background:rgba(13,15,24,.15);color:var(--ink);padding:3px 10px;border-radius:20px;font-weight:700;letter-spacing:1px}
+.preview-body{padding:22px;font-family:'Times New Roman',serif}
+.preview-republic{text-align:center;font-size:11px;font-weight:700;color:var(--ink);letter-spacing:.5px;margin-bottom:2px}
+.preview-motto{text-align:center;font-size:11px;color:var(--slate);margin-bottom:12px}
+.preview-divider{border-top:1px solid #ccc;margin:6px 0 12px}
+.preview-title{text-align:center;font-size:18px;font-weight:700;color:var(--ink);letter-spacing:.5px;margin-bottom:2px}
+.preview-subtitle{text-align:center;font-size:14px;font-weight:700;color:var(--gold);letter-spacing:.5px;margin-bottom:14px}
+.preview-between{text-align:center;font-size:12px;color:var(--slate);margin-bottom:4px}
+.preview-parties{text-align:center;font-size:12px;color:var(--ink);font-weight:700;margin-bottom:12px}
+.preview-divider2{border-top:1px dashed #e5dcc8;margin:10px 0}
+.preview-row{display:flex;gap:6px;font-size:11px;margin-bottom:5px}
+.preview-row .lbl{color:var(--slate);flex-shrink:0;min-width:90px}
+.preview-row .val{color:var(--ink);font-weight:600;font-family:'DM Sans',sans-serif}
+.preview-row .val.placeholder{color:#c4b89a;font-weight:400;font-style:italic}
+.preview-section{margin-top:12px}
+.preview-section-title{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold);font-family:'DM Sans',sans-serif;margin-bottom:6px}
+.preview-scope-tags{display:flex;flex-wrap:wrap;gap:4px}
+.preview-scope-tag{font-size:10px;background:rgba(184,149,58,.1);border:1px solid rgba(184,149,58,.25);color:var(--gold);padding:2px 8px;border-radius:20px;font-family:'DM Sans',sans-serif}
+.preview-scope-tag.empty{background:#f0f0f0;border-color:#ddd;color:#bbb;font-style:italic}
+.preview-term-row{display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px}
+.preview-term-row .lbl{color:var(--slate)}
+.preview-term-row .val{color:var(--ink);font-weight:600}
+
+.completeness{margin-top:16px;padding:12px 14px;border-radius:4px;background:#f8f5ee}
+.completeness-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--slate);margin-bottom:8px;font-family:'DM Sans',sans-serif}
+.completeness-bar-wrap{height:6px;background:#e5dcc8;border-radius:3px;margin-bottom:8px;overflow:hidden}
+.completeness-bar{height:100%;background:linear-gradient(90deg,var(--gold),var(--gl));border-radius:3px;transition:.4s}
+.completeness-pct{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:var(--gold)}
+.completeness-items{display:flex;flex-direction:column;gap:3px}
+.ci{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--slate);font-family:'DM Sans',sans-serif}
+.ci .dot{width:6px;height:6px;border-radius:50%;background:#e5dcc8;flex-shrink:0}
+.ci.done .dot{background:var(--green)}
+.ci.done{color:var(--ink)}
+
+/* ── GENERATE BUTTON ── */
+.gen-section{margin-top:16px}
+.btn-generate{width:100%;padding:16px;background:linear-gradient(135deg,var(--gold),var(--gl));border:none;border-radius:4px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink);cursor:pointer;transition:.3s;display:flex;align-items:center;justify-content:center;gap:10px}
+.btn-generate:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(184,149,58,.35)}
+.btn-generate:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:none}
+.btn-generate .spinner{display:none;width:16px;height:16px;border:2px solid rgba(13,15,24,.3);border-top-color:var(--ink);border-radius:50%;animation:spin .7s linear infinite}
+.btn-generate.loading .spinner{display:block}
+.btn-generate.loading .btn-text{display:none}
+@keyframes spin{to{transform:rotate(360deg)}}
+.success-banner{display:none;background:linear-gradient(135deg,#dcfce7,#f0fdf4);border:1px solid rgba(22,163,74,.25);border-radius:4px;padding:16px;text-align:center;margin-top:12px}
+.success-banner h4{color:var(--green);font-size:15px;margin-bottom:4px}
+.success-banner p{font-size:12px;color:var(--slate)}
+
+/* ── NOTES BOX ── */
+.notes-box{background:var(--ink2);border-radius:6px;padding:20px;margin-top:16px}
+.notes-box-title{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:12px}
+.notes-item{display:flex;gap:10px;font-size:12px;color:rgba(255,255,255,.5);margin-bottom:8px;line-height:1.5}
+.notes-item .ico{flex-shrink:0;color:var(--gl)}
+
+/* ── BILINGUAL ── */
+.vi{display:initial}.en{display:none}
+div.vi{display:block}div.en{display:none}
+body.le .vi{display:none!important}body.le .en{display:initial}
+body.le div.vi{display:none!important}body.le div.en{display:block}
+
+/* ── RESPONSIVE ── */
+@media(max-width:900px){
+  .main{grid-template-columns:1fr;padding:16px}
+  .preview-panel{position:static}
+  .form-row{grid-template-columns:1fr}
+}
+@media(max-width:600px){
+  .steps-strip{display:none}
+  .form-body{padding:18px}
+}
+</style>
+<script>
+function setLang(l){
+  document.body.className=l==='en'?'le':'';
+  localStorage.setItem('dl-lang',l);
+  document.querySelectorAll('.lang-btns button').forEach(b=>b.classList.toggle('active',b.dataset.lang===l));
+}
+document.addEventListener('DOMContentLoaded', () => {
+  const l=localStorage.getItem('dl-lang')||'vi';
+  document.body.className=l==='en'?'le':'';
+  document.querySelectorAll('.lang-btns button').forEach(b=>b.classList.toggle('active',b.dataset.lang===l));
+  initForm();
+});
+</script>
+</head>
+<body>
+<div class="topbar">
+  <div style="display:flex;align-items:center;gap:20px">
+    <span class="topbar-logo">DELULU JSC · MOU Builder</span>
+  </div>
+  <div class="lang-btns">
+    <button data-lang="vi" onclick="setLang('vi')" class="active">🇻🇳 VI</button>
+    <button data-lang="en" onclick="setLang('en')">🇺🇸 EN</button>
+  </div>
+</div>
+
+<div class="hero">
+  <div class="hero-badge"> ✦ MOU · <span class="vi">Biên Bản Ghi Nhớ</span><span class="en">Memorandum of Understanding</span></div>
+  <h1>
+    <span class="vi">Điền thông tin → <em>Tải ngay file .docx</em></span>
+    <span class="en">Fill details → <em>Download .docx instantly</em></span>
+  </h1>
+  <p class="hero-sub">
+    <span class="vi">Không cần đăng nhập. Điền form bên dưới — file Word hoàn chỉnh tự động tạo ngay trên trình duyệt của bạn.</span>
+    <span class="en">No login needed. Fill the form below — complete Word file generated instantly in your browser.</span>
+  </p>
+  <div class="steps-strip">
+    <div class="step-pill active"><div class="num">1</div><span class="vi">Điền thông tin Bên B</span><span class="en">Fill Party B info</span></div>
+    <div class="step-arrow">→</div>
+    <div class="step-pill active"><div class="num">2</div><span class="vi">Chọn lĩnh vực hợp tác</span><span class="en">Select cooperation areas</span></div>
+    <div class="step-arrow">→</div>
+    <div class="step-pill active"><div class="num">3</div><span class="vi">Xem preview & tải .docx</span><span class="en">Preview & download .docx</span></div>
+    <div class="step-arrow">→</div>
+    <div class="step-pill"><div class="num">4</div><span class="vi">In 2 bản, ký & đóng dấu</span><span class="en">Print 2 copies, sign & seal</span></div>
+  </div>
+</div>
+
+<div class="main">
+  <div>
+    <div class="form-panel">
+      <div class="form-panel-head">
+        <div class="ico">📋</div>
+        <div>
+          <h2><span class="vi">Thông tin Bên B</span><span class="en">Party B Information</span></h2>
+          <p><span class="vi">Thông tin Bên A (DELULU) đã điền sẵn trong tài liệu</span><span class="en">Party A (DELULU) info is pre-filled in the document</span></p>
+        </div>
+      </div>
+      <div class="form-body">
+        <div class="section-label vi"> ✦ Thông tin đơn vị</div>
+        <div class="section-label en"> ✦ Entity details</div>
+        <div class="form-group">
+          <label class="form-label">
+            <span class="vi">Tên đơn vị / công ty *</span>
+            <span class="en">Entity / company name *</span>
+          </label>
+          <input id="b-name" class="form-input" type="text" placeholder="Vd: Công ty TNHH ABC / ABC Co., Ltd." oninput="onFieldChange()">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">
+              <span class="vi">Mã số thuế / ĐKKD *</span>
+              <span class="en">Tax ID / Biz Reg. No. *</span>
+            </label>
+            <input id="b-tax" class="form-input" type="text" placeholder="0312345678" oninput="onFieldChange()">
+          </div>
+          <div class="form-group">
+            <label class="form-label">
+              <span class="vi">Lĩnh vực hoạt động</span>
+              <span class="en">Business sector</span>
+            </label>
+            <input id="b-sector" class="form-input" type="text" placeholder="Vd: Bất động sản / Real estate" oninput="onFieldChange()">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">
+            <span class="vi">Địa chỉ trụ sở *</span>
+            <span class="en">Registered address *</span>
+          </label>
+          <input id="b-address" class="form-input" type="text" placeholder="Vd: 123 Nguyễn Huệ, Q.1, TP.HCM" oninput="onFieldChange()">
+        </div>
+
+        <div class="form-divider"></div>
+        <div class="section-label vi"> ✦ Người đại diện ký kết</div>
+        <div class="section-label en"> ✦ Authorized representative</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">
+              <span class="vi">Họ và tên *</span>
+              <span class="en">Full name *</span>
+            </label>
+            <input id="b-rep" class="form-input" type="text" placeholder="Nguyễn Văn A / Nguyen Van A" oninput="onFieldChange()">
+          </div>
+          <div class="form-group">
+            <label class="form-label">
+              <span class="vi">Chức danh *</span>
+              <span class="en">Title / Position *</span>
+            </label>
+            <input id="b-title" class="form-input" type="text" placeholder="Giám đốc / Director" oninput="onFieldChange()">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">
+              <span class="vi">Số điện thoại</span>
+              <span class="en">Phone number</span>
+            </label>
+            <input id="b-phone" class="form-input" type="tel" placeholder="0912 345 678" oninput="onFieldChange()">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email</label>
+            <input id="b-email" class="form-input" type="email" placeholder="contact@company.com" oninput="onFieldChange()">
+          </div>
+        </div>
+
+        <div class="form-divider"></div>
+        <div class="section-label vi"> ✦ Ngày ký & Thời hạn</div>
+        <div class="section-label en"> ✦ Date signed & Duration</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">
+              <span class="vi">Ngày ký kết *</span>
+              <span class="en">Date of signing *</span>
+            </label>
+            <div class="date-group">
+              <div class="date-part">
+                <label>Ngày/Day</label>
+                <input id="sign-day" class="form-input" type="number" min="1" max="31" placeholder="01" oninput="onFieldChange()">
+              </div>
+              <div class="date-part">
+                <label>Tháng/Month</label>
+                <input id="sign-month" class="form-input" type="number" min="1" max="12" placeholder="06" oninput="onFieldChange()">
+              </div>
+              <div class="date-part">
+                <label>Năm/Year</label>
+                <input id="sign-year" class="form-input" type="number" min="2024" max="2030" placeholder="2026" oninput="onFieldChange()">
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">
+              <span class="vi">Thời hạn MOU</span>
+              <span class="en">MOU duration</span>
+            </label>
+            <select id="mou-term" class="term-select" onchange="onFieldChange()">
+              <option value="1">1 năm / 1 year (mặc định / default)</option>
+              <option value="2">2 năm / 2 years</option>
+              <option value="3">3 năm / 3 years</option>
+              <option value="0.5">6 tháng / 6 months</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-divider"></div>
+        <div class="section-label vi"> ✦ Lĩnh vực hợp tác <span style="font-size:11px;color:var(--muted);text-transform:none;letter-spacing:0;font-weight:400">(chọn ít nhất 1)</span></div>
+        <div class="section-label en"> ✦ Cooperation areas <span style="font-size:11px;color:var(--muted);text-transform:none;letter-spacing:0;font-weight:400">(select at least 1)</span></div>
+        <div class="checkbox-group" id="scope-group">
+          <label class="checkbox-item">
+            <input type="checkbox" name="scope" value="referral" onchange="onScopeChange()">
+            <div class="cb-text">
+              <span class="vi">Giới thiệu khách hàng </span><span class="en">Mutual client referrals</span>
+              <small><span class="vi">Hai bên giới thiệu khách hàng tiềm năng phù hợp cho nhau</span><span class="en">Both parties cross-refer suitable potential clients</span></small>
+            </div>
+          </label>
+          <label class="checkbox-item">
+            <input type="checkbox" name="scope" value="events" onchange="onScopeChange()">
+            <div class="cb-text">
+              <span class="vi">Đồng tổ chức sự kiện, hội thảo</span><span class="en">Co-organize events and seminars</span>
+              <small><span class="vi">Webinar, workshop, hội nghị, networking</span><span class="en">Webinars, workshops, conferences, networking</span></small>
+            </div>
+          </label>
+          <label class="checkbox-item">
+            <input type="checkbox" name="scope" value="knowledge" onchange="onScopeChange()">
+            <div class="cb-text">
+              <span class="vi">Chia sẻ tài liệu, kiến thức chuyên ngành</span><span class="en">Share industry documents and knowledge</span>
+              <small><span class="vi">Báo cáo thị trường, case study, best practices</span><span class="en">Market reports, case studies, best practices</span></small>
+            </div>
+          </label>
+          <label class="checkbox-item">
+            <input type="checkbox" name="scope" value="product" onchange="onScopeChange()">
+            <div class="cb-text">
+              <span class="vi">Phát triển sản phẩm / dịch vụ chung</span><span class="en">Co-develop products or services</span>
+              <small><span class="vi">Xây dựng gói dịch vụ kết hợp, giải pháp liên ngành</span><span class="en">Build combined service packages, cross-sector solutions</span></small>
+            </div>
+          </label>
+          <label class="checkbox-item">
+            <input type="checkbox" name="scope" value="marketing" onchange="onScopeChange()">
+            <div class="cb-text">
+              <span class="vi">Truyền thông và marketing liên kết</span><span class="en">Cooperative marketing and communications</span>
+              <small><span class="vi">Co-branding, social media, email marketing chéo</span><span class="en">Co-branding, social media, cross-email marketing</span></small>
+            </div>
+          </label>
+          <label class="checkbox-item" id="scope-other-cb">
+            <input type="checkbox" name="scope" value="other" onchange="onScopeChange()">
+            <div class="cb-text" style="width:100%">
+              <span class="vi">Khác</span><span class="en">Other</span>
+              <small><span class="vi">Ghi rõ bên dưới</span><span class="en">Specify below</span></small>
+            </div>
+          </label>
+          <div class="scope-other" id="scope-other-input">
+            <input id="scope-other-text" class="form-input" type="text" placeholder="Mô tả lĩnh vực hợp tác khác / Describe other cooperation area..." oninput="onFieldChange()">
+          </div>
+        </div>
+
+        <div class="form-divider"></div>
+        <div class="form-group">
+          <label class="form-label">
+            <span class="vi">Ghi chú thêm <span style="font-weight:400;text-transform:none;letter-spacing:0;font-style:italic">(không bắt buộc)</span></span>
+            <span class="en">Additional notes <span style="font-weight:400;text-transform:none;letter-spacing:0;font-style:italic">(optional)</span></span>
+          </label>
+          <textarea id="b-notes" class="form-input form-textarea" placeholder="Vd: Chi tiết phạm vi hợp tác, điều khoản đặc biệt, phụ lục cần đính kèm..." oninput="onFieldChange()"></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="preview-panel">
+    <div class="preview-card">
+      <div class="preview-head">
+        <h3>
+          <span class="vi">Xem trước tài liệu</span>
+          <span class="en">Document preview</span>
+        </h3>
+        <span>LIVE</span>
+      </div>
+      <div class="preview-body">
+        <div class="preview-republic">CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</div>
+        <div class="preview-motto">Độc lập – Tự do – Hạnh phúc</div>
+        <div class="preview-divider"></div>
+        <div class="preview-title">BIÊN BẢN GHI NHỚ HỢP TÁC</div>
+        <div class="preview-subtitle">MEMORANDUM OF UNDERSTANDING</div>
+        <div class="preview-between">Giữa / Between:</div>
+        <div class="preview-parties">
+          <strong>DELULU JSC</strong>
+          <span style="color:var(--slate)"> — và / and — </span>
+          <strong id="prev-bname" style="color:var(--gold)">
+            <span class="vi">[Chưa nhập / Not yet filled]</span>
+            <span class="en">[Not yet filled]</span>
+          </strong>
+        </div>
+        <div class="preview-divider2"></div>
+        
+        <div class="preview-section">
+          <div class="preview-section-title">
+            <span class="vi"> ✦ BÊN A (đã điền sẵn)</span>
+            <span class="en"> ✦ PARTY A (pre-filled)</span>
+          </div>
+          <div class="preview-row"><span class="lbl vi">Đơn vị:</span><span class="lbl en">Entity:</span><span class="val">CÔNG TY CỔ PHẦN DELULU</span></div>
+          <div class="preview-row"><span class="lbl vi">MST:</span><span class="lbl en">Tax ID:</span><span class="val">0319403035</span></div>
+          <div class="preview-row"><span class="lbl vi">Địa chỉ:</span><span class="lbl en">Address:</span><span class="val" style="font-size:10px">120 Trương Văn Bang, phường Cát Lái, TP.HCM</span></div>
+          <div class="preview-row"><span class="lbl vi">Đại diện:</span><span class="lbl en">Rep:</span><span class="val">Bà Nguyễn Lê Bảo Ngọc — Tổng Giám đốc</span></div>
+        </div>
+        <div class="preview-divider2"></div>
+        
+        <div class="preview-section">
+          <div class="preview-section-title">
+            <span class="vi"> ✦ BÊN B (bạn đang điền)</span>
+            <span class="en"> ✦ PARTY B (you are filling)</span>
+          </div>
+          <div class="preview-row"><span class="lbl vi">Đơn vị:</span><span class="lbl en">Entity:</span><span id="pv-name" class="val placeholder">—</span></div>
+          <div class="preview-row"><span class="lbl">MST:</span><span id="pv-tax" class="val placeholder">—</span></div>
+          <div class="preview-row"><span class="lbl vi">Địa chỉ:</span><span class="lbl en">Address:</span><span id="pv-address" class="val placeholder">—</span></div>
+          <div class="preview-row"><span class="lbl vi">Đại diện:</span><span class="lbl en">Rep:</span><span id="pv-rep" class="val placeholder">—</span></div>
+          <div class="preview-row"><span class="lbl vi">Liên hệ:</span><span class="lbl en">Contact:</span><span id="pv-contact" class="val placeholder">—</span></div>
+        </div>
+        <div class="preview-divider2"></div>
+        
+        <div class="preview-section">
+          <div class="preview-section-title">
+            <span class="vi"> ✦ LĨNH VỰC HỢP TÁC</span>
+            <span class="en"> ✦ COOPERATION AREAS</span>
+          </div>
+          <div class="preview-scope-tags" id="pv-scope">
+            <span class="preview-scope-tag empty"><span class="vi">Chưa chọn</span><span class="en">None selected</span></span>
+          </div>
+        </div>
+        <div class="preview-divider2"></div>
+        
+        <div class="preview-section">
+          <div class="preview-section-title">
+            <span class="vi"> ✦ THỜI HẠN & NGÀY KÝ</span>
+            <span class="en"> ✦ DURATION & DATE SIGNED</span>
+          </div>
+          <div class="preview-term-row"><span class="lbl vi">Ngày ký:</span><span class="lbl en">Date signed:</span><span id="pv-date" class="val">—</span></div>
+          <div class="preview-term-row"><span class="lbl vi">Thời hạn:</span><span class="lbl en">Duration:</span><span id="pv-term" class="val">1 năm (tự động gia hạn)</span></div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="completeness">
+      <div class="completeness-title">
+        <span class="vi">MỨC ĐỘ HOÀN THÀNH / </span><span class="en">COMPLETENESS / </span><span class="completeness-pct" id="pct-text">0%</span>
+      </div>
+      <div class="completeness-bar-wrap">
+        <div class="completeness-bar" id="pct-bar" style="width:0%"></div>
+      </div>
+      <div class="completeness-items">
+        <div class="ci" id="ci-name"><div class="dot"></div><span class="vi">Tên đơn vị Bên B</span><span class="en">Party B entity name</span></div>
+        <div class="ci" id="ci-tax"><div class="dot"></div><span class="vi">Mã số thuế</span><span class="en">Tax ID</span></div>
+        <div class="ci" id="ci-address"><div class="dot"></div><span class="vi">Địa chỉ trụ sở</span><span class="en">Registered address</span></div>
+        <div class="ci" id="ci-rep"><div class="dot"></div><span class="vi">Người đại diện</span><span class="en">Representative name</span></div>
+        <div class="ci" id="ci-title"><div class="dot"></div><span class="vi">Chức danh đại diện</span><span class="en">Representative title</span></div>
+        <div class="ci" id="ci-date"><div class="dot"></div><span class="vi">Ngày ký kết</span><span class="en">Date of signing</span></div>
+        <div class="ci" id="ci-scope"><div class="dot"></div><span class="vi">Lĩnh vực hợp tác</span><span class="en">Cooperation areas</span></div>
+      </div>
+    </div>
+
+    <div class="gen-section">
+      <button id="btn-gen" class="btn-generate" onclick="generateDocx()" disabled>
+        <div class="spinner"></div>
+        <div class="btn-text">
+          ⬇ <span class="vi">Tạo & Tải file .docx</span><span class="en">Generate & Download .docx</span>
+        </div>
+      </button>
+    </div>
+    
+    <div class="success-banner" id="success-banner">
+      <h4>🎉 <span class="vi">Tạo file thành công!</span><span class="en">File created successfully!</span></h4>
+      <p>
+        <span class="vi">File <strong>MOU_DELULU.docx</strong> đã tải về máy. In 2 bản, ký tay & đóng dấu. Gửi 1 bản về DELULU qua email hoặc gặp trực tiếp.</span>
+        <span class="en">File <strong>MOU_DELULU.docx</strong> downloaded. Print 2 copies, sign & seal. Send 1 copy to DELULU via email or in person.</span>
+      </p>
+    </div>
+
+    <div class="notes-box">
+      <div class="notes-box-title">✦ <span class="vi">Lưu ý</span><span class="en">Notes</span></div>
+      <div class="notes-item"><span class="ico">🔒</span><span><span class="vi">Dữ liệu không rời khỏi máy bạn — file được tạo hoàn toàn trên trình duyệt, không gửi về server.</span><span class="en">Data never leaves your device — the file is generated entirely in your browser.</span></span></div>
+      <div class="notes-item"><span class="ico">📝</span><span><span class="vi">Sau khi tải về, mở bằng Microsoft Word để chỉnh sửa thêm nếu cần.</span><span class="en">After downloading, open with Microsoft Word for further edits.</span></span></div>
+      <div class="notes-item"><span class="ico">⚖️</span><span><span class="vi">Tùy chọn: công chứng MOU tại VPCC Thủ Thiêm để đảm bảo giá trị pháp lý tối đa.</span><span class="en">Optional: notarize the MOU at Thu Thiem Notary Office for maximum legal validity.</span></span></div>
+      <div class="notes-item"><span class="ico">📞</span><span>0876 199 186 · hoadon.delulu@gmail.com</span></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const SCOPE_VI = { referral: 'Giới thiệu khách hàng qua lại', events: 'Đồng tổ chức sự kiện', knowledge: 'Chia sẻ tài liệu & kiến thức', product: 'Phát triển sản phẩm/dịch vụ chung', marketing: 'Marketing liên kết', other: 'Khác' };
+const SCOPE_EN = { referral: 'Mutual client referrals', events: 'Co-organize events', knowledge: 'Share documents & knowledge', product: 'Co-develop products/services', marketing: 'Cooperative marketing', other: 'Other' };
+
+function getVals(){
+  const chks = [...document.querySelectorAll('input[name="scope"]:checked')].map(c=>c.value);
+  return {
+    bName: document.getElementById('b-name').value.trim(),
+    bTax: document.getElementById('b-tax').value.trim(),
+    bSector: document.getElementById('b-sector').value.trim(),
+    bAddress: document.getElementById('b-address').value.trim(),
+    bRep: document.getElementById('b-rep').value.trim(),
+    bTitle: document.getElementById('b-title').value.trim(),
+    bPhone: document.getElementById('b-phone').value.trim(),
+    bEmail: document.getElementById('b-email').value.trim(),
+    bNotes: document.getElementById('b-notes').value.trim(),
+    signDay: document.getElementById('sign-day').value.trim(),
+    signMonth: document.getElementById('sign-month').value.trim(),
+    signYear: document.getElementById('sign-year').value.trim(),
+    term: document.getElementById('mou-term').value,
+    scope: chks,
+    scopeOther: document.getElementById('scope-other-text').value.trim(),
+  };
+}
+
+function fdate(v){
+  const d = v.signDay ? v.signDay.padStart(2,'0') : '...';
+  const m = v.signMonth ? v.signMonth.padStart(2,'0') : '...';
+  const y = v.signYear || '2026';
+  return `${d}/${m}/${y}`;
+}
+
+function ftermLabel(t){
+  const m={'1':'1 năm / 1 year','2':'2 năm / 2 years','3':'3 năm / 3 years','0.5':'6 tháng / 6 months'};
+  return (m[t]||'1 năm') + ' — tự động gia hạn / auto-renews';
+}
+
+function updatePreview(){
+  const v = getVals();
+  const isLang = document.body.classList.contains('le') ? 'en' : 'vi';
+  const bname = document.getElementById('prev-bname');
+  
+  if(v.bName){ bname.textContent = v.bName; bname.style.color = 'var(--gold)'; }
+  else { bname.innerHTML = '<span class="vi">[Chưa nhập]</span><span class="en">[Not yet filled]</span>'; bname.style.color=''; }
+  
+  setPV('pv-name', v.bName);
+  setPV('pv-tax', v.bTax);
+  setPV('pv-address', v.bAddress);
+  setPV('pv-rep', v.bRep ? v.bRep + (v.bTitle ? ' — '+v.bTitle : '') : '');
+  const contact = [v.bPhone, v.bEmail].filter(Boolean).join('  ·  ');
+  setPV('pv-contact', contact);
+  setPV('pv-date', v.signDay && v.signMonth ? fdate(v) : null);
+  document.getElementById('pv-term').textContent = ftermLabel(v.term);
+  
+  const scopeEl = document.getElementById('pv-scope');
+  if(v.scope.length === 0){
+    scopeEl.innerHTML = '<span class="preview-scope-tag empty"><span class="vi">Chưa chọn</span><span class="en">None selected</span></span>';
+  } else {
+    scopeEl.innerHTML = v.scope.map(s => {
+      const lbl = isLang==='en' ? SCOPE_EN[s] : SCOPE_VI[s];
+      return `<span class="preview-scope-tag">${lbl}${s==='other'&&v.scopeOther?' ('+v.scopeOther+')':''}</span>`;
+    }).join('');
+  }
+  
+  const checks = {
+    'ci-name': !!v.bName, 'ci-tax': !!v.bTax, 'ci-address': !!v.bAddress,
+    'ci-rep': !!v.bRep, 'ci-title': !!v.bTitle, 'ci-date': !!(v.signDay && v.signMonth),
+    'ci-scope': v.scope.length > 0,
+  };
+  const done = Object.values(checks).filter(Boolean).length;
+  const total = Object.keys(checks).length;
+  const pct = Math.round((done/total)*100);
+  
+  const pctText = document.getElementById('pct-text');
+  const pctBar  = document.getElementById('pct-bar');
+  const btnGen  = document.getElementById('btn-gen');
+  if(pctText) pctText.textContent = pct + '%';
+  if(pctBar)  pctBar.style.width = pct + '%';
+  Object.entries(checks).forEach(([id, ok])=>{
+    const el = document.getElementById(id);
+    if(el) el.classList.toggle('done', ok);
+  });
+  if(btnGen) btnGen.disabled = (pct < 70);
+}
+
+function setPV(id, val){
+  const el = document.getElementById(id);
+  if(!el) return;
+  if(val){ el.textContent = val; el.className = 'val'; }
+  else { el.textContent = '—'; el.className = 'val placeholder'; }
+}
+
+function onFieldChange(){ updatePreview(); }
+
+function onScopeChange(){
+  const hasOther = document.querySelector('input[value="other"]:checked');
+  document.getElementById('scope-other-input').classList.toggle('show', !!hasOther);
+  updatePreview();
+}
+
+function initForm(){
+  const today = new Date();
+  document.getElementById('sign-day').value   = today.getDate();
+  document.getElementById('sign-month').value = today.getMonth()+1;
+  document.getElementById('sign-year').value  = today.getFullYear();
+  document.querySelector('input[value="referral"]').checked = true;
+  updatePreview();
+}
+
+async function generateDocx(){
+  const v = getVals();
+  const btn = document.getElementById('btn-gen');
+  btn.classList.add('loading');
+  btn.disabled = true;
+  try {
+    await new Promise(r => setTimeout(r, 100)); 
+    const blob = await buildDocx(v);
+    // Lưu file DOCX
+    saveAs(blob, `MOU_DELULU_${sanitize(v.bName)}_${fdate(v).replace(/\//g,'-')}.docx`);
+    document.getElementById('success-banner').style.display = 'block';
+    setTimeout(()=>document.getElementById('success-banner').scrollIntoView({behavior:'smooth',block:'nearest'}), 100);
+  } catch(e){
+    console.error(e);
+    alert('Lỗi tạo file. Vui lòng tải lại trang và thử lại.\nError generating file. Please reload the page.\n\n'+e.message);
+  } finally {
+    btn.classList.remove('loading');
+    btn.disabled = false;
+  }
+}
+
+function sanitize(s){ return (s||'doitac').replace(/[^a-zA-Z0-9À-ỹ\s]/g,'').replace(/\s+/g,'_').substring(0,30)||'doitac'; }
+
+async function buildDocx(v){
+  const d = window.docx;
+  if(!d) throw new Error('Thư viện docx chưa tải xong. Vui lòng tải lại trang.');
+  
+  const { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell, AlignmentType, BorderStyle, WidthType, ShadingType, VerticalAlign, PageNumber, Header, Footer } = d;
+  
+  const INK='0D0F18', GOLD='B8953A', SLATE='6B7280', LIGHT='FAF7F2';
+  const noBrd = {style:BorderStyle.NONE,size:0,color:'FFFFFF'};
+  const noBrds = {top:noBrd,bottom:noBrd,left:noBrd,right:noBrd};
+  const goldBrd = {style:BorderStyle.SINGLE,size:4,color:GOLD};
+  const thinBrd = {style:BorderStyle.SINGLE,size:1,color:'D4AF5A'};
+  const blk = (n=6)=>new Paragraph({spacing:{before:n*10,after:n*10}});
+  const rule = ()=>new Paragraph({border:{bottom:{style:BorderStyle.SINGLE,size:4,color:GOLD,space:2}},spacing:{before:60,after:60}});
+
+  const biHead = (vi,en)=>new Paragraph({spacing:{before:200,after:80},children:[
+    new TextRun({text:vi,font:'Palatino Linotype',size:18,bold:true,color:GOLD,allCaps:true}),
+    new TextRun({text:'  /  ',font:'Palatino Linotype',size:18,color:GOLD}),
+    new TextRun({text:en,font:'Palatino Linotype',size:18,bold:true,color:GOLD,allCaps:true}),
+  ]});
+  
+  const biPara=(vi,en,indent=false)=>new Paragraph({
+    spacing:{before:80,after:60,line:320}, indent:indent?{left:360}:{},
+    children:[
+      new TextRun({text:vi,font:'Times New Roman',size:22,color:INK}),
+      new TextRun({break:1}),
+      new TextRun({text:en,font:'Times New Roman',size:20,color:SLATE,italics:true}),
+    ],
+  });
+  
+  const clause=(num,vi,en)=>[
+    new Paragraph({spacing:{before:140,after:40,line:300},children:[
+      new TextRun({text:`Điều ${num}. `,font:'Times New Roman',size:22,bold:true,color:INK}),
+      new TextRun({text:vi,font:'Times New Roman',size:22,color:INK}),
+    ]}),
+    new Paragraph({spacing:{before:20,after:80},indent:{left:360},children:[
+      new TextRun({text:`Article ${num}. `,font:'Times New Roman',size:20,bold:true,color:SLATE,italics:true}),
+      new TextRun({text:en,font:'Times New Roman',size:20,color:SLATE,italics:true}),
+    ]}),
+  ];
+  
+  const bul=(vi,en)=>[
+    new Paragraph({spacing:{before:40,after:20},indent:{left:600,hanging:240},children:[
+      new TextRun({text:'• ',font:'Times New Roman',size:22,color:GOLD}),
+      new TextRun({text:vi,font:'Times New Roman',size:22,color:INK}),
+    ]}),
+    new Paragraph({spacing:{before:0,after:40},indent:{left:600},children:[
+      new TextRun({text:en,font:'Times New Roman',size:20,color:SLATE,italics:true}),
+    ]}),
+  ];
+
+  const scopeViList = v.scope.map(s=>SCOPE_VI[s]+(s==='other'&&v.scopeOther?' ('+v.scopeOther+')':'')).join(', ');
+  const scopeEnList = v.scope.map(s=>SCOPE_EN[s]+(s==='other'&&v.scopeOther?' ('+v.scopeOther+')':'')).join(', ');
+  const dateStr = fdate(v);
+  const termYr = v.term==='0.5'?'6 tháng / 6 months':`${v.term} năm / ${v.term} year${v.term>1?'s':''}`;
+
+  const partyBTable = new Table({
+    width:{size:9066,type:WidthType.DXA},columnWidths:[1800,7266],
+    borders:{top:noBrd,bottom:noBrd,left:noBrd,right:noBrd,insideH:noBrd,insideV:noBrd},
+    rows:[new TableRow({children:[
+      new TableCell({borders:{left:{style:BorderStyle.SINGLE,size:8,color:SLATE},top:noBrd,bottom:noBrd,right:noBrd},shading:{fill:'F4F4F5',type:ShadingType.CLEAR},margins:{top:100,bottom:100,left:180,right:160},width:{size:1800,type:WidthType.DXA},verticalAlign:VerticalAlign.CENTER,children:[
+        new Paragraph({alignment:AlignmentType.CENTER,children:[new TextRun({text:'BÊN B',font:'Palatino Linotype',size:24,bold:true,color:INK})]}),
+        new Paragraph({alignment:AlignmentType.CENTER,children:[new TextRun({text:'PARTY B',font:'Palatino Linotype',size:18,color:SLATE})]}),
+      ]}),
+      new TableCell({borders:noBrds,shading:{fill:'F4F4F5',type:ShadingType.CLEAR},margins:{top:100,bottom:100,left:200,right:160},width:{size:7266,type:WidthType.DXA},children:[
+        new Paragraph({spacing:{after:40},children:[new TextRun({text:'Tên đơn vị / Entity: ',font:'Times New Roman',size:22,bold:true,color:INK}),new TextRun({text:v.bName||'...',font:'Times New Roman',size:22,bold:true,color:v.bName?INK:'AAAAAA'})]}),
+        new Paragraph({spacing:{after:40},children:[new TextRun({text:'Mã số thuế / Tax ID: ',font:'Times New Roman',size:22,color:INK}),new TextRun({text:v.bTax||'...',font:'Times New Roman',size:22,color:v.bTax?INK:'AAAAAA'})]}),
+        v.bSector?new Paragraph({spacing:{after:40},children:[new TextRun({text:'Lĩnh vực / Sector: ',font:'Times New Roman',size:22,color:INK}),new TextRun({text:v.bSector,font:'Times New Roman',size:22,color:INK})]}):new Paragraph({children:[]}),
+        new Paragraph({spacing:{after:40},children:[new TextRun({text:'Địa chỉ / Address: ',font:'Times New Roman',size:22,color:INK}),new TextRun({text:v.bAddress||'...',font:'Times New Roman',size:22,color:v.bAddress?INK:'AAAAAA'})]}),
+        new Paragraph({spacing:{after:40},children:[new TextRun({text:'Đại diện / Representative: ',font:'Times New Roman',size:22,color:INK}),new TextRun({text:(v.bRep||'...')+(v.bTitle?' — '+v.bTitle:''),font:'Times New Roman',size:22,color:v.bRep?INK:'AAAAAA'})]}),
+        new Paragraph({children:[new TextRun({text:'Liên hệ / Contact: ',font:'Times New Roman',size:22,color:INK}),new TextRun({text:[v.bPhone,v.bEmail].filter(Boolean).join('  ·  ')||'...',font:'Times New Roman',size:22,color:(v.bPhone||v.bEmail)?INK:'AAAAAA'})]}),
+      ]}),
+    ]})]
+  });
+
+  const partyATable = new Table({
+    width:{size:9066,type:WidthType.DXA},columnWidths:[1800,7266],
+    borders:{top:noBrd,bottom:noBrd,left:noBrd,right:noBrd,insideH:noBrd,insideV:noBrd},
+    rows:[new TableRow({children:[
+      new TableCell({borders:{left:{style:BorderStyle.SINGLE,size:8,color:GOLD},top:noBrd,bottom:noBrd,right:noBrd},shading:{fill:LIGHT,type:ShadingType.CLEAR},margins:{top:100,bottom:100,left:180,right:160},width:{size:1800,type:WidthType.DXA},verticalAlign:VerticalAlign.CENTER,children:[
+        new Paragraph({alignment:AlignmentType.CENTER,children:[new TextRun({text:'BÊN A',font:'Palatino Linotype',size:24,bold:true,color:GOLD})]}),
+        new Paragraph({alignment:AlignmentType.CENTER,children:[new TextRun({text:'PARTY A',font:'Palatino Linotype',size:18,color:GOLD})]}),
+      ]}),
+      new TableCell({borders:noBrds,shading:{fill:LIGHT,type:ShadingType.CLEAR},margins:{top:100,bottom:100,left:200,right:160},width:{size:7266,type:WidthType.DXA},children:[
+        new Paragraph({spacing:{after:40},children:[new TextRun({text:'Tên đơn vị / Entity: ',font:'Times New Roman',size:22,bold:true,color:INK}),new TextRun({text:'CÔNG TY CỔ PHẦN DELULU',font:'Times New Roman',size:22,bold:true,color:INK})]}),
+        new Paragraph({spacing:{after:40},children:[new TextRun({text:'Mã số thuế / Tax ID: ',font:'Times New Roman',size:22,color:INK}),new TextRun({text:'0319403035',font:'Times New Roman',size:22,color:INK})]}),
+        new Paragraph({spacing:{after:40},children:[new TextRun({text:'Địa chỉ / Address: ',font:'Times New Roman',size:22,color:INK}),new TextRun({text:'120 Trương Văn Bang, P. Cát Lái, TP.Thủ Đức, TP.HCM',font:'Times New Roman',size:22,color:INK})]}),
+        new Paragraph({spacing:{after:40},children:[new TextRun({text:'Đại diện / Representative: ',font:'Times New Roman',size:22,color:INK}),new TextRun({text:'Bà Nguyễn Lê Bảo Ngọc — Tổng Giám đốc / CEO',font:'Times New Roman',size:22,color:INK})]}),
+        new Paragraph({children:[new TextRun({text:'Liên hệ / Contact: ',font:'Times New Roman',size:22,color:INK}),new TextRun({text:'0876 199 186  ·  hoadon.delulu@gmail.com',font:'Times New Roman',size:22,color:INK})]}),
+      ]}),
+    ]})]
+  });
+
+  const sigTable = new Table({
+    width:{size:9360,type:WidthType.DXA},columnWidths:[4560,240,4560],
+    borders:{top:noBrd,bottom:noBrd,left:noBrd,right:noBrd,insideH:noBrd,insideV:noBrd},
+    rows:[new TableRow({children:[
+      new TableCell({borders:noBrds,width:{size:4560,type:WidthType.DXA},margins:{top:80,bottom:80,left:0,right:120},children:[
+        new Paragraph({alignment:AlignmentType.CENTER,children:[new TextRun({text:'ĐẠI DIỆN BÊN A / PARTY A',font:'Times New Roman',size:18,bold:true,color:GOLD,allCaps:true})]}),
+        new Paragraph({alignment:AlignmentType.CENTER,spacing:{before:20,after:60},children:[new TextRun({text:'DELULU JSC',font:'Palatino Linotype',size:22,bold:true,color:INK})]}),
+        new Paragraph({alignment:AlignmentType.CENTER,children:[new TextRun({text:'Chức danh / Title: Tổng Giám đốc / CEO',font:'Times New Roman',size:20,color:SLATE})]}),
+        blk(24),
+        new Paragraph({alignment:AlignmentType.CENTER,border:{top:{style:BorderStyle.SINGLE,size:2,color:INK}},children:[new TextRun({text:'Ký tên & đóng dấu / Signature & Seal',font:'Times New Roman',size:18,color:SLATE})]}),
+        new Paragraph({alignment:AlignmentType.CENTER,spacing:{before:40},children:[new TextRun({text:`Ngày / Date: ${dateStr}`,font:'Times New Roman',size:20,color:INK})]}),
+      ]}),
+      new TableCell({borders:noBrds,width:{size:240,type:WidthType.DXA},children:[new Paragraph({children:[]})]}),
+      new TableCell({borders:noBrds,width:{size:4560,type:WidthType.DXA},margins:{top:80,bottom:80,left:120,right:0},children:[
+        new Paragraph({alignment:AlignmentType.CENTER,children:[new TextRun({text:'ĐẠI DIỆN BÊN B / PARTY B',font:'Times New Roman',size:18,bold:true,color:GOLD,allCaps:true})]}),
+        new Paragraph({alignment:AlignmentType.CENTER,spacing:{before:20,after:60},children:[new TextRun({text:v.bName||'[Tên đơn vị]',font:'Palatino Linotype',size:22,bold:true,color:v.bName?INK:'AAAAAA'})]}),
+        new Paragraph({alignment:AlignmentType.CENTER,children:[new TextRun({text:`Chức danh / Title: ${v.bTitle||'...............'}`,font:'Times New Roman',size:20,color:SLATE})]}),
+        blk(24),
+        new Paragraph({alignment:AlignmentType.CENTER,border:{top:{style:BorderStyle.SINGLE,size:2,color:INK}},children:[new TextRun({text:'Ký tên & đóng dấu / Signature & Seal',font:'Times New Roman',size:18,color:SLATE})]}),
+        new Paragraph({alignment:AlignmentType.CENTER,spacing:{before:40},children:[new TextRun({text:`Ngày / Date: ${dateStr}`,font:'Times New Roman',size:20,color:INK})]}),
+      ]}),
+    ]})]
+  });
+
+  const notaryBox = new Table({
+    width:{size:9066,type:WidthType.DXA},columnWidths:[9066],
+    borders:{top:thinBrd,bottom:thinBrd,left:{style:BorderStyle.SINGLE,size:8,color:GOLD},right:noBrd,insideH:noBrd,insideV:noBrd},
+    rows:[new TableRow({children:[new TableCell({
+      borders:noBrds,shading:{fill:LIGHT,type:ShadingType.CLEAR},margins:{top:120,bottom:120,left:200,right:200},
+      children:[
+        new Paragraph({spacing:{after:40},children:[new TextRun({text:' ✦ LƯU Ý CÔNG CHỨNG / NOTARIZATION NOTE',font:'Palatino Linotype',size:20,bold:true,color:GOLD})]}),
+        new Paragraph({spacing:{after:20,line:300},children:[new TextRun({text:'MOU này có thể được công chứng tùy chọn tại Văn Phòng Công Chứng Thủ Thiêm (120 Trương Văn Bang, TP.HCM) để có giá trị pháp lý cao nhất. Liên hệ: 0876 199 186.',font:'Times New Roman',size:20,color:INK})]}),
+        new Paragraph({children:[new TextRun({text:'This MOU may optionally be notarized at Thu Thiem Notary Office for maximum legal validity. Contact 0876 199 186.',font:'Times New Roman',size:18,color:SLATE,italics:true})]}),
+      ],
+    })]})]
+  });
+
+  const doc = new Document({
+    sections:[{
+      properties:{page:{size:{width:11906,height:16838},margin:{top:1440,right:1440,bottom:1440,left:1800}}},
+      headers:{default:new Header({children:[
+        new Table({width:{size:9066,type:WidthType.DXA},columnWidths:[7066,2000],
+          borders:{top:noBrd,bottom:goldBrd,left:noBrd,right:noBrd,insideH:noBrd,insideV:noBrd},
+          rows:[new TableRow({children:[
+            new TableCell({borders:noBrds,width:{size:7066,type:WidthType.DXA},margins:{bottom:60},verticalAlign:VerticalAlign.BOTTOM,children:[
+              new Paragraph({children:[
+                new TextRun({text:'DELULU JSC',font:'Palatino Linotype',size:18,bold:true,color:GOLD}),
+                new TextRun({text:'  ·  MST 0319403035  ·  hoadon.delulu@gmail.com',font:'Times New Roman',size:16,color:SLATE}),
+              ]}),
+            ]}),
+            new TableCell({borders:noBrds,width:{size:2000,type:WidthType.DXA},verticalAlign:VerticalAlign.BOTTOM,margins:{bottom:60},children:[
+              new Paragraph({alignment:AlignmentType.RIGHT,children:[
+                new TextRun({text:'MOU · ',font:'Times New Roman',size:14,color:GOLD}),
+                new TextRun({text:dateStr,font:'JetBrains Mono',size:14,color:SLATE}),
+              ]}),
+            ]}),
+          ]})]
+        }),
+      ]})},
+      footers:{default:new Footer({children:[
+        new Table({width:{size:9066,type:WidthType.DXA},columnWidths:[6500,2566],
+          borders:{top:thinBrd,bottom:noBrd,left:noBrd,right:noBrd,insideH:noBrd,insideV:noBrd},
+          rows:[new TableRow({children:[
+            new TableCell({borders:noBrds,margins:{top:60},children:[
+              new Paragraph({children:[new TextRun({text:'BIÊN BẢN GHI NHỚ HỢP TÁC  ·  MEMORANDUM OF UNDERSTANDING',font:'Times New Roman',size:14,color:SLATE})]}),
+            ]}),
+            new TableCell({borders:noBrds,margins:{top:60},children:[
+              new Paragraph({alignment:AlignmentType.RIGHT,children:[
+                new TextRun({text:'Trang / Page ',font:'Times New Roman',size:14,color:SLATE}),
+                new TextRun({children:[PageNumber.CURRENT],font:'Times New Roman',size:14,color:GOLD}),
+                new TextRun({text:' / ',font:'Times New Roman',size:14,color:SLATE}),
+                new TextRun({children:[PageNumber.TOTAL_PAGES],font:'Times New Roman',size:14,color:SLATE}),
+              ]}),
+            ]}),
+          ]})]
+        }),
+      ]})},
+      children:[
+        blk(20),
+        new Paragraph({alignment:AlignmentType.CENTER,spacing:{before:160,after:40},children:[new TextRun({text:'CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM',font:'Palatino Linotype',size:22,bold:true,color:INK,allCaps:true})]}),
+        new Paragraph({alignment:AlignmentType.CENTER,spacing:{after:20},children:[new TextRun({text:'Độc lập – Tự do – Hạnh phúc',font:'Palatino Linotype',size:22,color:INK})]}),
+        new Paragraph({alignment:AlignmentType.CENTER,spacing:{after:20},border:{bottom:{style:BorderStyle.SINGLE,size:3,color:INK,space:3}},children:[new TextRun({text:'─────────────────────',font:'Times New Roman',size:18,color:INK})]}),
+        blk(16),
+        new Paragraph({alignment:AlignmentType.CENTER,spacing:{before:160,after:60},children:[new TextRun({text:'BIÊN BẢN GHI NHỚ HỢP TÁC',font:'Palatino Linotype',size:36,bold:true,color:INK,allCaps:true})]}),
+        new Paragraph({alignment:AlignmentType.CENTER,spacing:{after:60},children:[new TextRun({text:'MEMORANDUM OF UNDERSTANDING',font:'Palatino Linotype',size:28,bold:true,color:GOLD,allCaps:true})]}),
+        new Paragraph({alignment:AlignmentType.CENTER,spacing:{after:20},children:[new TextRun({text:'(MOU)',font:'Palatino Linotype',size:24,color:GOLD})]}),
+        blk(12),
+        new Paragraph({alignment:AlignmentType.CENTER,children:[
+          new TextRun({text:'Giữa / Between:   ',font:'Times New Roman',size:22,color:SLATE}),
+          new TextRun({text:'DELULU JSC',font:'Palatino Linotype',size:24,bold:true,color:INK}),
+          new TextRun({text:'   và / and   ',font:'Times New Roman',size:22,color:SLATE}),
+          new TextRun({text:v.bName||'[Tên đối tác]',font:'Palatino Linotype',size:24,bold:true,color:v.bName?INK:'AAAAAA'}),
+        ]}),
+        blk(8),
+        new Paragraph({alignment:AlignmentType.CENTER,children:[
+          new TextRun({text:'Ngày ký / Date: ',font:'Times New Roman',size:20,color:SLATE}),
+          new TextRun({text:dateStr,font:'Times New Roman',size:20,color:INK}),
+          new TextRun({text:'     Tại / At: TP. Hồ Chí Minh',font:'Times New Roman',size:20,color:INK}),
+        ]}),
+        blk(20),rule(),blk(8),
+        biHead('CÁC BÊN THAM GIA','PARTIES TO THIS MOU'),
+        blk(6), partyATable, blk(8), partyBTable, blk(8), rule(),
+        blk(8),biHead('NỘI DUNG CỤ THỂ','SPECIFIC TERMS'),
+        ...clause(1,'Mục đích hợp tác','Purpose of Cooperation'),
+        biPara('Hai bên thiết lập quan hệ hợp tác chiến lược trên cơ sở tự nguyện, bình đẳng và cùng có lợi, nhằm nâng cao chất lượng dịch vụ cho khách hàng chung và mở rộng phạm vi hoạt động của cả hai đơn vị.','Both parties establish a strategic cooperation on a voluntary, equal, and mutually beneficial basis, to improve service quality for shared clients and expand the reach of both organizations.',true),
+        ...clause(2,'Phạm vi hợp tác','Scope of Cooperation'),
+        biPara('2.1  Các lĩnh vực hợp tác đã thỏa thuận:','2.1  Agreed areas of cooperation:',true),
+        new Paragraph({spacing:{before:60,after:80},indent:{left:600},children:[
+          new TextRun({text:scopeViList||'(Xem danh sách đính kèm)',font:'Times New Roman',size:22,bold:true,color:INK}),
+          new TextRun({break:1}),
+          new TextRun({text:scopeEnList||'(See attached list)',font:'Times New Roman',size:20,color:SLATE,italics:true}),
+        ]}),
+        biPara('2.2  Chi tiết phạm vi hợp tác cụ thể có thể được bổ sung tại Phụ lục đính kèm MOU này.','2.2  Specific scope details may be added in an Annex attached to this MOU.',true),
+        ...(v.bNotes?[biPara(`2.3  Ghi chú bổ sung / Additional notes: ${v.bNotes}`,'',true)]:[]),
+        ...clause(3,'Nghĩa vụ của các bên','Obligations of the Parties'),
+        biPara('3.1  Mỗi bên cam kết:','3.1  Each party commits to:',true),
+        ...bul('Chỉ định đầu mối liên lạc chính thức và phản hồi trong vòng 48 giờ làm việc.','Designate an official contact and respond within 48 business hours.'),
+        ...bul('Giới thiệu khách hàng trung thực, không phóng đại năng lực của bên kia.','Refer clients honestly without overstating the other party\'s capabilities.'),
+        ...bul('Bảo mật thông tin khách hàng và tài liệu nội bộ của bên kia.','Maintain confidentiality of client information and internal documents.'),
+        ...bul('Thông báo trước ít nhất 30 ngày nếu muốn chấm dứt hợp tác.','Provide at least 30 days\' notice when wishing to terminate cooperation.'),
+        ...clause(4,'Điều khoản tài chính','Financial Terms'),
+        biPara('MOU này không tạo ra nghĩa vụ tài chính trực tiếp. Nếu phát sinh doanh thu từ hợp tác, tỷ lệ chia sẻ sẽ được thỏa thuận riêng bằng văn bản và bổ sung vào Phụ lục. Mỗi bên tự chịu chi phí vận hành nội bộ.','This MOU creates no direct financial obligations. Should revenue arise, the sharing arrangement will be agreed separately in writing. Each party bears its own internal operating costs.',true),
+        ...clause(5,'Bảo mật thông tin','Confidentiality'),
+        biPara('Các bên không tiết lộ thông tin bí mật của bên kia cho bên thứ ba nếu không có sự đồng ý bằng văn bản. Nghĩa vụ bảo mật có hiệu lực trong thời hạn MOU và kéo dài thêm 02 (hai) năm sau khi chấm dứt.','The parties shall not disclose each other\'s confidential information without written consent. The confidentiality obligation continues during the MOU term and for 2 (two) years after termination.',true),
+        ...clause(6,'Hiệu lực & Thời hạn','Effective Date & Duration'),
+        biPara(`MOU có hiệu lực từ ngày ${dateStr} và có giá trị ${termYr}. MOU sẽ tự động gia hạn thêm 01 năm nếu không có bên nào thông báo chấm dứt trước 30 ngày. Có thể chấm dứt sớm nếu cả hai bên đồng thuận bằng văn bản.`,`MOU takes effect from ${dateStr} and is valid for ${termYr}. It auto-renews for 1 year without 30-day termination notice. Early termination by mutual written agreement is possible.`,true),
+        ...clause(7,'Luật điều chỉnh & Giải quyết tranh chấp','Governing Law & Dispute Resolution'),
+        biPara('MOU điều chỉnh bởi pháp luật Việt Nam. Mọi tranh chấp giải quyết qua thương lượng trước; nếu không đạt được thỏa thuận, đưa ra Tòa án nhân dân có thẩm quyền tại TP.HCM.','Governed by Vietnamese law. Disputes shall first be resolved through negotiation; failing that, submitted to the competent People\'s Court in HCMC.',true),
+        ...clause(8,'Điều khoản chung','General Provisions'),
+        biPara('MOU được lập thành 02 (hai) bản gốc, mỗi bên giữ 01 (một) bản, có giá trị pháp lý như nhau. Mọi sửa đổi phải bằng văn bản và có chữ ký của đại diện có thẩm quyền cả hai bên. MOU không tạo ra quan hệ đại lý, liên doanh hay quan hệ lao động.','Made in 2 (two) originals of equal validity. All amendments must be in writing signed by authorized representatives. This MOU does not create agency, joint venture, or employment relationships.',true),
+        blk(16),rule(),blk(12),
+        biHead('CHỮ KÝ XÁC NHẬN','SIGNATURES'),
+        biPara('Đại diện có thẩm quyền xác nhận đã đọc, hiểu và đồng ý với toàn bộ nội dung MOU này.','Authorized representatives confirm they have read, understood, and agreed to the contents of this MOU.',false),
+        blk(12), sigTable, blk(12), notaryBox
+      ]
+    }]
+  });
+  return await Packer.toBlob(doc);
+}
+</script>
+</body>
+</html>
